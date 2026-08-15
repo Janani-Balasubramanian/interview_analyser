@@ -10,10 +10,12 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
-        value: sqlite:///./interview_analyzer.db
+        sync: false          # set manually in Render dashboard (paste Neon URL)
       - key: USE_MOCK_AI
         value: "true"
       - key: OPENAI_API_KEY
         value: ""
+      - key: FRONTEND_URL
+        sync: false          # set manually after Netlify deploy
       - key: PYTHON_VERSION
         value: "3.12.0"
