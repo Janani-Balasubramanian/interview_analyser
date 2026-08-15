@@ -39,18 +39,14 @@ def can_start_interview(db: Session, user: User) -> tuple[bool, str]:
     if free_remaining > 0:
         return True, "Free interview available"
     
-    # Bonus: one extra interview when cumulative score exceeds threshold
     if credit.bonus_unlocked:
-        bonus_limit = settings.FREE_INTERVIEWS_PER_MONTH + 1
-        if credit.interviews_completed < bonus_limit:
+        # Allow one more if bonus unlocked and they haven't used extra? 
+        # For simplicity: once unlocked, they can do the 5th
+        if credit.interviews_completed < settings.FREE_INTERVIEWS_PER_MONTH + 1:
             return True, "Bonus interview unlocked"
-        return False, "Monthly limit reached (including bonus). Keep practicing next month!"
+        return False, "Monthly limit reached (including bonus)"
     
-    score_needed = settings.BONUS_UNLOCK_SCORE - credit.total_score
-    return False, (
-        f"No free interviews left this month. "
-        f"Score {score_needed:.0f} more points across retries to unlock a bonus interview."
-    )
+    return False, f"No free interviews left. Score {credit.total_score:.0f}/250 needed for bonus unlock."
 
 
 def record_interview_completion(db: Session, user: User, score: float) -> MonthlyCredit:

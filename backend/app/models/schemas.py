@@ -103,7 +103,6 @@ class MonthlyCreditResponse(BaseModel):
     interviews_completed: int
     can_start_interview: bool
     progress_to_bonus: float  # 0-100 percentage toward 250
-    message: Optional[str] = None
 
     class Config:
         from_attributes = True

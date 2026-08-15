@@ -1,169 +1,144 @@
-# AI Interview Performance Analyzer — Voice-to-Voice
+# AI-Based Interview Performance Analyzer
 
-A fully voice-based mock interview platform. The AI speaks questions, you answer by voice, AI scores and speaks feedback. No questions shown on screen.
+Full-stack MVP for practicing mock interviews with AI scoring, free-tier limits, gamified credit system, experience tiers, and domain tracks.
 
----
+## Features Implemented
 
-## How it works
+- User registration / login (JWT)
+- Experience tiers (Tier 1 / 2 / 3)
+- Domain tracks (Software Engineering, Data Analytics, HR, Business Analytics, Product Management, Marketing)
+- Free tier: 4 interviews/month
+- Gamified scoring: accumulate >250 points to unlock 5th bonus interview
+- Mock AI scoring (switch to real OpenAI by setting API key)
+- Dashboard with progress, credits, history
+- Interview flow + detailed report
 
-1. Register / Login
-2. Pick a domain (Software Engineering, HR, etc.) on the Dashboard
-3. Click **Start Interview** → you land in a fullscreen voice session
-4. **AI speaks** the question via text-to-speech
-5. **You speak** your answer — browser mic records it live
-6. AI scores your answer and **speaks back** the score + feedback
-7. Repeats for 5 questions, then navigates to your detailed Report
+## Project Structure
 
----
-
-## Stack
-
-| Layer | Tech | Hosted on |
-|---|---|---|
-| Frontend | React 19 + TypeScript + Vite | **Netlify** |
-| Backend | FastAPI + SQLAlchemy | **Render** |
-| Database | PostgreSQL | **Neon** (free) |
-| AI Scoring | Mock (default) or OpenAI GPT-4o-mini | — |
-| Voice In | Web Speech API (browser STT) | — |
-| Voice Out | Web Speech Synthesis API (browser TTS) | — |
-
----
-
-## 🚀 Deploy in 4 steps (all free)
-
-### Step 1 — Create Neon database (free PostgreSQL)
-
-1. Go to **https://neon.tech** → Sign up → **Create project**
-2. Name it `interview-analyzer`
-3. On the project dashboard, click **Connection Details**
-4. Copy the **Connection string** — it looks like:
-   ```
-   postgresql://user:password@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
-   ```
-   Keep this safe — you'll need it in steps 2 and 3.
-
----
-
-### Step 2 — Push code to GitHub
-
-```bash
-# From the project root (interview-analyzer/interview-analyzer/)
-git remote add origin https://github.com/YOUR_USERNAME/interview-analyzer.git
-git branch -M main
-git push -u origin main
+```
+interview-analyzer/
+├── backend/                 # FastAPI
+│   ├── app/
+│   │   ├── core/            # config, database, security
+│   │   ├── models/          # SQLAlchemy + Pydantic
+│   │   ├── routers/         # auth, interviews, dashboard
+│   │   ├── services/        # scoring, credits
+│   │   └── main.py
+│   └── requirements.txt
+└── frontend/                # React + Vite + TypeScript
+    └── src/
+        ├── pages/           # Login, Register, Dashboard, Interview, Report
+        ├── components/
+        └── api.ts
 ```
 
----
+## Quick Start (Local)
 
-### Step 3 — Deploy Backend on Render
-
-1. Go to **https://render.com** → Sign up with GitHub → **New → Web Service**
-2. Connect your GitHub repo
-3. Settings:
-   - **Root Directory:** `backend`
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-   - **Plan:** Free
-4. **Environment Variables** (add these):
-
-   | Key | Value |
-   |---|---|
-   | `SECRET_KEY` | Click **Generate** |
-   | `DATABASE_URL` | Your Neon connection string from Step 1 |
-   | `USE_MOCK_AI` | `true` |
-   | `FRONTEND_URL` | *(leave blank for now — fill after Step 4)* |
-
-5. Click **Create Web Service** — wait ~3 min
-6. Your backend URL: `https://interview-analyzer-api.onrender.com`
-
----
-
-### Step 4 — Deploy Frontend on Netlify
-
-1. Go to **https://app.netlify.com** → **Add new site → Import from Git**
-2. Connect your GitHub repo
-3. Settings:
-   - **Base directory:** `frontend`
-   - **Build command:** `npm run build`
-   - **Publish directory:** `frontend/dist`
-4. **Environment Variables** (Site settings → Environment variables):
-
-   | Key | Value |
-   |---|---|
-   | `VITE_API_URL` | `https://interview-analyzer-api.onrender.com` |
-
-5. Click **Deploy** — wait ~2 min
-6. Your frontend URL: `https://your-app.netlify.app`
-
----
-
-### Final step — Wire CORS
-
-Go back to **Render → your service → Environment → Edit**:
-
-| Key | Value |
-|---|---|
-| `FRONTEND_URL` | `https://your-app.netlify.app` |
-
-Save → Render auto-redeploys. ✅ Both are now connected.
-
----
-
-## Local Development
-
-### Backend
+### 1. Backend
 
 ```bash
 cd backend
+python -m venv venv
+source venv/bin/activate          # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
-# Create .env (copy from .env.example)
-# For local dev, SQLite works fine:
-# DATABASE_URL=sqlite:///./interview_analyzer.db
+# Optional: create .env
+cp .env.example .env
 
-python -m uvicorn app.main:app --reload --port 8000
-# → http://localhost:8000/docs
+# Run
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### Frontend
+API docs: http://localhost:8000/docs
+
+### 2. Frontend
 
 ```bash
 cd frontend
 npm install
+npm install react-router-dom axios   # if not already installed
+
+# Optional: set API URL
+# Create .env → VITE_API_URL=http://localhost:8000/api/v1
+
 npm run dev
-# → http://localhost:5173
 ```
 
-Vite proxies `/api → localhost:8000` in dev — no CORS config needed locally.
+Open http://localhost:5173
+
+### 3. Test Flow
+
+1. Register a new account (choose experience tier)
+2. On dashboard, select a domain and start interview
+3. Answer 5 questions (type answers)
+4. Finish → view report
+5. Scores accumulate toward the 250-point bonus unlock
+
+## Switching to Real AI Scoring
+
+In `backend/.env` (or environment):
+
+```
+OPENAI_API_KEY=sk-...
+USE_MOCK_AI=false
+```
+
+Restart the backend. The scoring service will call GPT-4o-mini with structured rubrics.
+
+## Deployment Recommendations
+
+### Recommended Stack (Simple & Cheap)
+
+| Component     | Platform              | Notes |
+|---------------|-----------------------|-------|
+| Frontend      | **Vercel**            | Free tier, automatic deploys from Git |
+| Backend       | **Railway** or **Render** | Easy Docker / native Python deploy |
+| Database      | **Railway Postgres** or **Supabase** / **Neon** | Free tiers available |
+| File Storage  | Cloudflare R2 or S3   | For future audio/video |
+
+### Alternative All-in-One
+
+- **Railway**: Deploy both frontend + backend + Postgres in one project
+- **Fly.io**: Great for global low-latency
+- **AWS / GCP / Azure**: For production scale later
+
+### Frontend Deploy (Vercel)
+
+1. Push repo to GitHub
+2. Import project in Vercel → select `frontend` folder
+3. Set environment variable: `VITE_API_URL=https://your-backend.up.railway.app/api/v1`
+4. Deploy
+
+### Backend Deploy (Railway)
+
+1. Create new project → Deploy from GitHub (select `backend` folder)
+2. Add environment variables:
+   - `SECRET_KEY` = long random string
+   - `DATABASE_URL` = Railway Postgres connection string
+   - `OPENAI_API_KEY` (optional)
+   - `USE_MOCK_AI=true` (or false)
+3. Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+4. Enable public networking
+
+### Production Checklist
+
+- [ ] Change `SECRET_KEY`
+- [ ] Use PostgreSQL instead of SQLite
+- [ ] Restrict CORS origins
+- [ ] Add rate limiting
+- [ ] Set up HTTPS (automatic on Vercel/Railway)
+- [ ] Configure proper logging & monitoring
+- [ ] Add audio recording (MediaRecorder API) + Whisper transcription for real voice interviews
+
+## Extending the Project
+
+- Add voice recording + Whisper transcription
+- Expand question bank per domain/tier
+- Real LLM judge with better rubrics
+- Stripe subscriptions for unlimited interviews
+- Peer comparison / leaderboards
+- Company-specific interview packs
 
 ---
 
-## Voice interview — browser requirements
-
-| Browser | STT (mic) | TTS (speaker) |
-|---|---|---|
-| Chrome / Edge | ✅ Full support | ✅ |
-| Firefox | ⚠️ Partial | ✅ |
-| Safari | ✅ iOS/macOS | ✅ |
-
-Chrome is recommended for the best voice recognition accuracy.
-
----
-
-## Environment Variables Reference
-
-### Backend
-
-| Variable | Default | Description |
-|---|---|---|
-| `SECRET_KEY` | (required!) | JWT signing key |
-| `DATABASE_URL` | `sqlite:///./interview_analyzer.db` | SQLite or Neon Postgres |
-| `USE_MOCK_AI` | `true` | `false` = use real OpenAI |
-| `OPENAI_API_KEY` | — | Only needed when `USE_MOCK_AI=false` |
-| `FRONTEND_URL` | — | Your Netlify URL — added to CORS allowlist |
-
-### Frontend
-
-| Variable | Description |
-|---|---|
-| `VITE_API_URL` | Full Render backend URL (set in Netlify env vars) |
+Built as a complete, runnable MVP matching the original product plan.

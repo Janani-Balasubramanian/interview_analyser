@@ -8,11 +8,11 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
 
     # Security
-    SECRET_KEY: str = "your-super-secret-key-change-in-production-please-use-env"
+    SECRET_KEY: str = "change-this-in-production"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
-    # Database
+    # Database  (SQLite locally, Neon Postgres in prod)
     DATABASE_URL: str = "sqlite:///./interview_analyzer.db"
 
     # AI
@@ -23,8 +23,7 @@ class Settings(BaseSettings):
     FREE_INTERVIEWS_PER_MONTH: int = 4
     BONUS_UNLOCK_SCORE: int = 250
 
-    # CORS — comma-separated list so it's easy to set via a single env var
-    # e.g. FRONTEND_URL=https://your-app.netlify.app
+    # CORS — set FRONTEND_URL to your Netlify URL in Render env vars
     FRONTEND_URL: str = ""
 
     @property
@@ -35,12 +34,10 @@ class Settings(BaseSettings):
             "http://localhost:5173",
             "http://127.0.0.1:5173",
         ]
-        if self.FRONTEND_URL:
-            # Support comma-separated list of URLs
-            for url in self.FRONTEND_URL.split(","):
-                url = url.strip()
-                if url and url not in origins:
-                    origins.append(url)
+        for url in self.FRONTEND_URL.split(","):
+            url = url.strip()
+            if url and url not in origins:
+                origins.append(url)
         return origins
 
     class Config:
