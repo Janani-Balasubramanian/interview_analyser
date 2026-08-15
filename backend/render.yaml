@@ -10,12 +10,13 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
-        sync: false          # set manually in Render dashboard (paste Neon URL)
+        # Paste your Neon connection string here or set it manually in the Render dashboard
+        value: postgresql://neondb_owner:npg_L4QNrGVSj6bu@ep-broad-meadow-ayovrrnp.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require
       - key: USE_MOCK_AI
         value: "true"
       - key: OPENAI_API_KEY
         value: ""
       - key: FRONTEND_URL
-        sync: false          # set manually after Netlify deploy
+        sync: false   # fill in after Netlify deploy
       - key: PYTHON_VERSION
         value: "3.12.0"
