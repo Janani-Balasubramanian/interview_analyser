@@ -1,0 +1,12 @@
+/* AI Interview Analyzer — global styles */
+
+/* Audio wave animation used in Interview.tsx */
+@keyframes pulse {
+  from { transform: scaleY(1); }
+  to   { transform: scaleY(1.8); }
+}
+
+/* Spin animation used in App.tsx loading spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
