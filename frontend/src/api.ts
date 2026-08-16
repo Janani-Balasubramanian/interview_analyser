@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 /**
- * Dev:  Vite proxy forwards /api → localhost:8000 (no CORS needed)
- * Prod: VITE_API_URL = https://your-backend.onrender.com  (set in Netlify env vars)
+ * Dev:  Vite proxy → /api goes to localhost:8000 (no CORS, no env var needed)
+ * Prod: set VITE_API_URL=https://your-render-url.onrender.com in Netlify env vars
  */
 const API_BASE = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/api/v1`

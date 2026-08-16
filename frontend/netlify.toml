@@ -1,12 +1,11 @@
 [build]
-  base      = "."
-  publish   = "dist"
-  command   = "npm run build"
+  base    = "frontend"
+  publish = "dist"
+  command = "npm run build"
 
 [build.environment]
   NODE_VERSION = "22"
 
-# Rewrite all routes to index.html so React Router handles them client-side
 [[redirects]]
   from   = "/*"
   to     = "/index.html"
